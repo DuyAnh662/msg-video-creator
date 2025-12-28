@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 MSG Video Creator - Tạo Video Tin Nhắn AI</title>
+    <meta name="description"
+        content="Tạo video tin nhắn giả lập như Messenger, ChatGPT, Gemini với AI script generator">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text" data-i18n="loading">Đang xử lý...</p>
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">🎬</span>
+                    <span class="logo-text">MSG Video Creator</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- Language Toggle -->
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-lang="vi">VI</button>
+                    <button class="toggle-btn" data-lang="en">EN</button>
+                </div>
+
+                <!-- Theme Toggle -->
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-app-theme="light">☀️</button>
+                    <button class="toggle-btn" data-app-theme="dark">🌙</button>
+                </div>
+
+                <button class="btn btn-ghost" id="settings-btn">
+                    <span>⚙️</span>
+                </button>
+                <button class="btn btn-ghost" id="saved-templates-btn">
+                    <span>📦</span> <span data-i18n="templates">Templates</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel - Script Editor -->
+            <section class="panel script-panel">
+                <div class="panel-header">
+                    <h2><span>📝</span> <span data-i18n="scriptEditor">Script Editor</span></h2>
+                </div>
+
+                <!-- AI Generator Section -->
+                <div class="section ai-section">
+                    <div class="section-header">
+                        <h3><span>🤖</span> <span data-i18n="aiGenerator">AI Tạo Kịch Bản</span></h3>
+                    </div>
+
+                    <div class="form-group" id="ai-key-warning" style="display: none;">
+                        <div
+                            style="background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 10px; border: 1px solid #fecaca;">
+                            ⚠️ <span data-i18n="missingApiKey">Chưa nhập API Key! Vào Cài đặt (⚙️) để nhập.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="genre">Thể loại</label>
+                        <div class="genre-selector">
+                            <button class="genre-btn active" data-genre="drama">
+                                <span>🎭</span> Drama
+                            </button>
+                            <button class="genre-btn" data-genre="romance">
+                                <span>💕</span> <span data-i18n="romance">Tỏ tình</span>
+                            </button>
+                            <button class="genre-btn" data-genre="breakup">
+                                <span>💔</span> <span data-i18n="breakup">Chia tay</span>
+                            </button>
+                            <button class="genre-btn" data-genre="comedy">
+                                <span>😂</span> <span data-i18n="comedy">Hài hước</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="descriptionOptional">Mô tả nội dung (tùy chọn)</label>
+                        <textarea id="ai-prompt" class="input textarea" data-i18n-placeholder="promptPlaceholder"
+                            placeholder="VD: Cuộc hội thoại giữa 2 người yêu xa gặp lại sau 3 năm..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="emotionLevel">Cảm xúc chủ đạo</label>
+                        <div class="emotion-slider">
+                            <input type="range" id="emotion-level" min="0" max="100" value="50">
+                            <div class="emotion-labels">
+                                <span>😐</span>
+                                <span>😊</span>
+                                <span>😢</span>
+                                <span>😠</span>
+                                <span>😍</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-full" id="generate-ai-btn">
+                        <span>✨</span> <span data-i18n="generateAI">Tạo Kịch Bản AI</span>
+                    </button>
+                </div>
+
+                <div class="divider">
+                    <span data-i18n="orManual">hoặc nhập thủ công</span>
+                </div>
+
+                <!-- Manual Input Section -->
+                <div class="section manual-section">
+                    <div class="messages-list" id="messages-list">
+                        <!-- Messages will be added here -->
+                    </div>
+
+                    <div class="add-message-form">
+                        <div class="sender-toggle">
+                            <button class="sender-btn active" data-sender="A">
+                                <span>👤</span> <span data-i18n="personA">Người A</span>
+                            </button>
+                            <button class="sender-btn" data-sender="B">
+                                <span>👥</span> <span data-i18n="personB">Người B</span>
+                            </button>
+                        </div>
+                        <div class="message-input-group">
+                            <input type="text" id="new-message-input" class="input" data-i18n-placeholder="enterMessage"
+                                placeholder="Nhập tin nhắn...">
+                            <button class="btn btn-primary" id="add-message-btn">
+                                <span>+</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Panel - Preview -->
+            <section class="panel preview-panel">
+                <div class="panel-header">
+                    <h2><span>📱</span> <span data-i18n="videoPreview">Video Preview</span></h2>
+                    <div class="preview-controls">
+                        <button class="btn btn-sm btn-ghost" id="preview-play-btn">
+                            <span id="play-icon">▶️</span>
+                        </button>
+                        <button class="btn btn-sm btn-ghost" id="preview-reset-btn">
+                            <span>🔄</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Phone Frame -->
+                <div class="phone-frame" id="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <!-- Chat Header -->
+                        <div class="chat-header" id="chat-header">
+                            <div class="chat-avatar">
+                                <img id="receiver-avatar-display" src="" alt="">
+                            </div>
+                            <div class="chat-info">
+                                <span class="chat-name" id="receiver-name-display">Người B</span>
+                                <span class="chat-status" data-i18n="online">Đang hoạt động</span>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages -->
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Messages render here -->
+                        </div>
+
+                        <!-- Typing Indicator -->
+                        <div class="typing-indicator hidden" id="typing-indicator">
+                            <div class="typing-avatar">
+                                <img id="typing-avatar-img" src="" alt="">
+                            </div>
+                            <div class="typing-bubble">
+                                <span class="typing-dot"></span>
+                                <span class="typing-dot"></span>
+                                <span class="typing-dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Theme Selector -->
+                <div class="theme-selector">
+                    <label data-i18n="chatTheme">Chat Style:</label>
+                    <div class="theme-buttons">
+                        <button class="theme-btn active" data-theme="messenger">
+                            <span class="theme-icon"></span>
+                            Messenger
+                        </button>
+                        <button class="theme-btn" data-theme="chatgpt">
+                            <span class="theme-icon"></span>
+                            ChatGPT
+                        </button>
+                        <button class="theme-btn" data-theme="gemini">
+                            <span class="theme-icon"></span>
+                            Gemini
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Format Selector -->
+                <div class="format-selector">
+                    <label data-i18n="exportFormat">Format:</label>
+                    <div class="format-buttons">
+                        <button class="format-btn active" data-format="16:9">
+                            <span>🖥️</span> 16:9
+                        </button>
+                        <button class="format-btn" data-format="9:16">
+                            <span>📱</span> 9:16 TikTok
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel - Settings -->
+            <section class="panel settings-panel">
+                <div class="panel-header">
+                    <h2><span>🎨</span> <span data-i18n="customize">Tùy chỉnh</span></h2>
+                </div>
+
+                <!-- Avatar Section -->
+                <div class="section">
+                    <h3><span>👤</span> Avatar</h3>
+
+                    <div class="avatar-config">
+                        <div class="avatar-item">
+                            <label data-i18n="personA">Người A</label>
+                            <div class="avatar-picker">
+                                <div class="avatar-preview" id="avatar-a-preview">
+                                    <img id="avatar-a-img" src="" alt="A">
+                                </div>
+                                <input type="file" id="avatar-a-input" accept="image/*" hidden>
+                                <button class="btn btn-sm btn-ghost" id="avatar-a-btn" data-i18n="change">Đổi</button>
+                            </div>
+                            <input type="text" id="name-a-input" class="input input-sm" value="Người A"
+                                data-i18n-placeholder="name" placeholder="Tên">
+                        </div>
+
+                        <div class="avatar-item">
+                            <label data-i18n="personB">Người B</label>
+                            <div class="avatar-picker">
+                                <div class="avatar-preview" id="avatar-b-preview">
+                                    <img id="avatar-b-img" src="" alt="B">
+                                </div>
+                                <input type="file" id="avatar-b-input" accept="image/*" hidden>
+                                <button class="btn btn-sm btn-ghost" id="avatar-b-btn" data-i18n="change">Đổi</button>
+                            </div>
+                            <input type="text" id="name-b-input" class="input input-sm" value="Người B"
+                                data-i18n-placeholder="name" placeholder="Tên">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Music Section -->
+                <div class="section">
+                    <h3><span>🎵</span> <span data-i18n="bgMusic">Nhạc nền</span></h3>
+
+                    <div class="form-group">
+                        <select id="music-select" class="input select">
+                            <option value="" data-i18n="noMusic">Không có nhạc</option>
+                            <option value="romantic">💕 Romantic Piano</option>
+                            <option value="sad">😢 Sad Melody</option>
+                            <option value="happy">😊 Happy Vibes</option>
+                            <option value="dramatic">🎭 Dramatic Tension</option>
+                            <option value="comedy">😂 Funny BGM</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-i18n="uploadMusic">Hoặc upload nhạc</label>
+                        <input type="file" id="custom-music-input" accept="audio/*" class="input">
+                    </div>
+
+                    <div class="form-group">
+                        <label><span data-i18n="volume">Âm lượng</span>: <span id="volume-value">70</span>%</label>
+                        <input type="range" id="music-volume" min="0" max="100" value="70">
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="fade-music" checked>
+                        <label for="fade-music">Fade in/out (2s)</label>
+                    </div>
+                </div>
+
+                <!-- Sound Effects -->
+                <div class="section">
+                    <h3><span>🔊</span> <span data-i18n="soundEffects">Hiệu ứng âm thanh</span></h3>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="sound-send" checked>
+                        <label for="sound-send" data-i18n="sendSound">Tiếng gửi tin nhắn</label>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="sound-receive" checked>
+                        <label for="sound-receive" data-i18n="receiveSound">Tiếng nhận tin nhắn</label>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="sound-typing" checked>
+                        <label for="sound-typing" data-i18n="typingSound">Tiếng typing</label>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Timeline Section -->
+        <section class="timeline-section">
+            <div class="timeline-header">
+                <h3><span>🎞️</span> Timeline</h3>
+                <div class="timeline-controls">
+                    <span class="timeline-time" id="current-time">00:00</span>
+                    <span>/</span>
+                    <span class="timeline-time" id="total-time">00:00</span>
+                    <button class="btn btn-sm btn-ghost" id="zoom-out-btn">➖</button>
+                    <button class="btn btn-sm btn-ghost" id="zoom-in-btn">➕</button>
+                </div>
+            </div>
+
+            <div class="timeline-container">
+                <div class="timeline-track" id="timeline-track">
+                    <div class="timeline-playhead" id="timeline-playhead"></div>
+                    <div class="timeline-items" id="timeline-items">
+                        <!-- Timeline items will be added here -->
+                    </div>
+                </div>
+
+                <div class="timeline-audio-track" id="audio-waveform">
+                    <!-- Audio waveform visualization -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Export Section -->
+        <section class="export-section">
+            <button class="btn btn-lg btn-secondary" id="preview-full-btn">
+                <span>👁️</span> <span data-i18n="watchPreview">Xem Preview</span>
+            </button>
+            <button class="btn btn-lg btn-primary" id="export-btn">
+                <span>📥</span> <span data-i18n="exportVideo">Xuất Video WebM</span>
+            </button>
+            <button class="btn btn-lg btn-ghost" id="save-template-btn">
+                <span>💾</span> <span data-i18n="saveTemplate">Lưu Template</span>
+            </button>
+        </section>
+    </div>
+
+    <!-- Modals -->
+    <!-- AI Script Preview Modal -->
+    <div class="modal hidden" id="ai-script-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><span>🤖</span> <span data-i18n="aiScript">Kịch Bản AI</span></h2>
+                <button class="modal-close" id="close-ai-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ai-script-preview" id="ai-script-preview">
+                    <!-- AI generated script will appear here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="regenerate-script-btn">
+                    <span>🔄</span> <span data-i18n="regenerate">Tạo lại</span>
+                </button>
+                <button class="btn btn-primary" id="accept-script-btn">
+                    <span>✅</span> <span data-i18n="useScript">Dùng kịch bản này</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Modal -->
+    <div class="modal hidden" id="templates-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><span>📦</span> <span data-i18n="savedTemplates">Templates đã lưu</span></h2>
+                <button class="modal-close" id="close-templates-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="templates-list" id="templates-list">
+                    <!-- Saved templates will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal hidden" id="settings-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><span>⚙️</span> <span data-i18n="settings">Cài đặt API</span></h2>
+                <button class="modal-close" id="close-settings-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 15px; color: var(--text-secondary); font-size: 14px;">
+                    🔑 <span data-i18n="apiKeyNote">API Key được lưu trên trình duyệt của bạn. Tui không thu thập thông
+                        tin này.</span>
+                </p>
+
+                <div class="form-group">
+                    <label>Groq API Key (Miễn phí & Nhanh)</label>
+                    <input type="password" id="groq-key-input" class="input" placeholder="gsk_...">
+                    <small style="display: block; margin-top: 5px; color: var(--text-muted);">
+                        <a href="https://console.groq.com/keys" target="_blank"
+                            style="color: var(--accent-primary);">Lấy key tại đây</a>
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label>OpenAI API Key (ChatGPT)</label>
+                    <input type="password" id="openai-key-input" class="input" placeholder="sk-...">
+                </div>
+
+                <div class="form-group">
+                    <label>Gemini API Key</label>
+                    <input type="password" id="gemini-key-input" class="input" placeholder="AIza...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="save-settings-btn">
+                    <span>💾</span> <span data-i18n="save">Lưu Cài Đặt</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Progress Modal -->
+    <div class="modal hidden" id="export-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h2><span>🎬</span> <span data-i18n="exporting">Đang xuất video...</span></h2>
+            </div>
+            <div class="modal-body">
+                <div class="export-progress">
+                    <div class="export-progress-bar" id="export-progress-bar"></div>
+                </div>
+                <p class="export-status" id="export-status" data-i18n="preparing">Đang chuẩn bị...</p>
+                <p class="export-percent" id="export-percent">0%</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Canvas for Video Rendering -->
+    <canvas id="render-canvas" style="display: none;"></canvas>
+
+    <!-- Scripts -->
+    <script src="js/i18n.js"></script>
+    <script src="js/themes.js"></script>
+    <script src="js/aiGenerator.js"></script>
+    <script src="js/audioManager.js"></script>
+    <script src="js/videoRenderer.js"></script>
+    <script src="js/timeline.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
