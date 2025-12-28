@@ -2,9 +2,6 @@
 
 **MSG Video Creator** là công cụ giúp bạn tạo video tin nhắn giả lập (fake message) cực nhanh với sự hỗ trợ của AI. Hỗ trợ nhiều giao diện (Messenger, ChatGPT, Gemini) và xuất video chất lượng cao ngay trên trình duyệt.
 
-![Demo](https://via.placeholder.com/800x400?text=MSG+Video+Creator+Demo)
-*(Bạn có thể thay ảnh này bằng ảnh chụp màn hình thực tế của dự án)*
-
 ## ✨ Tính năng nổi bật
 
 -   **🤖 AI Writer Tốc độ cao**:
